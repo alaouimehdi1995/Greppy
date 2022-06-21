@@ -1,5 +1,6 @@
-use std::io::{self, BufReader, BufRead};
+use colored::*;
 use std::fs::{self, File};
+use std::io::{self, BufRead, BufReader};
 use std::path::Path;
 
 struct FoundOccurrence {
@@ -17,8 +18,6 @@ impl FoundOccurrence {
         }
     }
 }
-
-
 
 pub struct PathResult {
     scanned_files: u32,
@@ -41,34 +40,39 @@ impl PathResult {
     }
 }
 
-
 fn display_occurrence(occurrence: &FoundOccurrence) {
-    println!("{}::{}    {}", occurrence.path_str, occurrence.line_number, occurrence.line_str);
+    println!(
+        "{}::{}    {}",
+        occurrence.path_str.bold().purple(),
+        occurrence.line_number.to_string().green(),
+        occurrence.line_str
+    );
 }
 
-fn buffered_scan_file(file_path: &Path, str_to_find: &str) -> Result<Vec<FoundOccurrence>, io::Error>  {
+fn buffered_scan_file(
+    file_path: &Path,
+    str_to_find: &str,
+) -> Result<Vec<FoundOccurrence>, io::Error> {
     let file = File::open(file_path)?;
     let reader = BufReader::new(file);
 
-    Ok(
-        reader.lines().enumerate()
-            .filter(|(_, line_content)| {
-                if let Ok(line_content) = line_content {
-                    return line_content.contains(str_to_find)
-                }
-                false
-            })
-            .map(|(line_number, line_content)| (line_number, line_content.unwrap()))
-            .map(|(line_number, line_content)| {
-                let occurrence = FoundOccurrence::new(file_path, line_number, line_content);
-                display_occurrence(&occurrence);
-                occurrence
-            })
-            .collect::<Vec<FoundOccurrence>>()
-    )
+    Ok(reader
+        .lines()
+        .enumerate()
+        .filter(|(_, line_content)| {
+            if let Ok(line_content) = line_content {
+                return line_content.contains(str_to_find);
+            }
+            false
+        })
+        .map(|(line_number, line_content)| (line_number, line_content.unwrap()))
+        .map(|(line_number, line_content)| {
+            let occurrence = FoundOccurrence::new(file_path, line_number, line_content);
+            display_occurrence(&occurrence);
+            occurrence
+        })
+        .collect::<Vec<FoundOccurrence>>())
 }
-
-
 
 pub fn search_str_in_path(path: &Path, str_to_find: &str) -> PathResult {
     let mut path_result = PathResult::new();
@@ -81,22 +85,19 @@ pub fn search_str_in_path(path: &Path, str_to_find: &str) -> PathResult {
         return path_result;
     }
 
-
-
     if let Ok(read_dir) = fs::read_dir(path) {
-
-        let sub_dir_results: Vec<_> = read_dir.into_iter()
+        let sub_dir_results: Vec<_> = read_dir
+            .into_iter()
             .map(|entry| {
                 let sub_path = entry.unwrap().path();
                 search_str_in_path(&sub_path.as_path(), &str_to_find)
-            }
-            ).collect();
+            })
+            .collect();
 
         for sub_dir_result in sub_dir_results {
             path_result.scanned_files += sub_dir_result.scanned_files;
             path_result.found_results += sub_dir_result.found_results;
         }
-
     }
 
     path_result

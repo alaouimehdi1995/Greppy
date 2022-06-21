@@ -1,7 +1,7 @@
 mod grep;
+use clap::Parser;
 use std::path::PathBuf;
 use std::time::Instant;
-use clap::Parser;
 
 #[derive(Parser)]
 #[clap(author, version, about)]
@@ -18,5 +18,10 @@ fn main() {
     let results = grep::search_str_in_path(&args.source_path.as_path(), &args.text_to_find);
     let elapsed_time = now.elapsed();
 
-    println!("{} Results found in: {:.2?} (from {} files)", results.found_results(), elapsed_time, results.scanned_files());
+    println!(
+        "{} Results found in: {:.2?} (from {} files)",
+        results.found_results(),
+        elapsed_time,
+        results.scanned_files()
+    );
 }
