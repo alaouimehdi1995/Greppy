@@ -13,5 +13,11 @@ You can use it as the following:
 
 Or a simplified version: `./m_grep -s ~/example_path -t example_text`.
 
-You can also install it by moving the binary to `/usr/bin` folder, and therefore
-call `m_grep -s some_path -t some_text`
+You can also install it by moving the binary to `/usr/local/bin` folder:
+```sh
+sudo cp ./target/release/m_grep /usr/local/bin
+```
+and then, use `m_grep` command as the following: `m_grep -s some_path -t some_text`
+
+N.B. You can also use `--help` (or `-h`) option to get the full details and list of
+options of the binary.
