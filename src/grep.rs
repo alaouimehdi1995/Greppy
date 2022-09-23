@@ -42,7 +42,7 @@ impl PathResult {
 
 fn display_occurrence(occurrence: &FoundOccurrence) {
     println!(
-        "{}::{}    {}",
+        "> {}::{}    {}",
         occurrence.path_str.bold().purple(),
         occurrence.line_number.to_string().green(),
         occurrence.line_str
