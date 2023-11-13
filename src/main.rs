@@ -1,5 +1,8 @@
 mod grep;
+
 use clap::Parser;
+use colored::*;
+use grep::FoundOccurrence;
 use std::path::PathBuf;
 use std::time::Instant;
 
@@ -12,16 +15,27 @@ struct Args {
     text_to_find: String,
 }
 
+fn display_occurrence(occurrence: &FoundOccurrence) {
+    println!(
+        "> {}::{}    {}",
+        occurrence.file_path.bold().purple(),
+        occurrence.line_number.to_string().green(),
+        occurrence.line_text
+    );
+}
+
 fn main() {
     let args = Args::parse();
     let now = Instant::now();
-    let results = grep::search_str_in_path(&args.source_path.as_path(), &args.text_to_find);
+    let (scanned_files, result_count) = grep::recursive_scan_path_for_target_text(
+        args.text_to_find,
+        args.source_path.as_path(),
+        display_occurrence,
+    );
     let elapsed_time = now.elapsed();
 
     println!(
-        "{} Results found in: {:.2?} (from {} files)",
-        results.found_results(),
-        elapsed_time,
-        results.scanned_files()
+        "{:?} Results found in: {:.2?} (from {} files)",
+        result_count, elapsed_time, scanned_files
     );
 }
