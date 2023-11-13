@@ -1,6 +1,6 @@
 [package]
-name = "m_grep"
-version = "0.1.0"
+name = "greppy"
+version = "0.2.0"
 edition = "2021"
 authors = ["Mehdi ALAOUI <alaoui.mehdi.1995@gmail.com>"]
 description = "Implementation of simpliest version of `grep` command to learn Rust language"
